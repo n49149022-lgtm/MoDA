@@ -20,5 +20,5 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          git remote add space https://NIKOLAJ5313:$HF_TOKEN@huggingface.co/spaces/NIKOLAJ5313/moda-talking-head
+          git remote add space https://NIKOLAJ5313:$HF_TOKEN@huggingface.co/spaces/NIKOLAJ5313/moda-clean
           git push --force space main
