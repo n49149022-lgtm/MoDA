@@ -9,26 +9,27 @@ class AudioProcessor:
     def __init__(self, cfg_path=None, is_training=False):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         
-        # FIX: Вычисляем абсолютный путь от корня проекта, независимо от CWD
+        # Вычисляем абсолютный путь от корня проекта
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../'))
-        model_path = os.path.join(base_dir, 'pretrain_weights', 'audio', 'chinese-hubert-base')
+        local_path = os.path.join(base_dir, 'pretrain_weights', 'audio', 'chinese-hubert-base')
         
-        self.audio_encoder, self.feature_extractor = self.load_model(
-            model_weight_path=model_path,
-            device=self.device
-        )
-        print(f"AudioProcessor initialized on {self.device} | Path: {model_path}")
+        # FIX: Если локальная папка пуста или нет config.json -> качаем с HF автоматически
+        if os.path.exists(os.path.join(local_path, 'config.json')):
+            model_id = local_path
+            print(f"📂 Using local weights: {model_id}")
+        else:
+            model_id = 'TencentGameMate/chinese-hubert-base'
+            print(f"☁️ Local weights missing. Auto-downloading from HF: {model_id}")
+            
+        self.audio_encoder, self.feature_extractor = self.load_model(model_id, self.device)
 
-    def load_model(self, model_weight_path, device='cpu'):
-        print(f"Loading HuBERT model from {model_weight_path}...")
-        # local_files_only=False разрешает скачать с HF, если локально нет
-        kwargs = {"local_files_only": False}
-        
-        feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_weight_path, **kwargs)
-        audio_encoder = HubertModel.from_pretrained(model_weight_path, **kwargs).to(device=device)
+    def load_model(self, model_identifier, device='cpu'):
+        print(f"Loading HuBERT from: {model_identifier}...")
+        # local_files_only=False разрешает сетевую загрузку/кеш
+        feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_identifier, local_files_only=False)
+        audio_encoder = HubertModel.from_pretrained(model_identifier, local_files_only=False).to(device=device)
         audio_encoder.eval()
-        
-        print("✅ HuBERT model loaded successfully.")
+        print("✅ HuBERT loaded successfully.")
         return audio_encoder, feature_extractor
 
     def get_long_audio_emb(self, audio_path, target_sr=16000):
