@@ -2,6 +2,14 @@ models_config: configs/audio2motion/model/models.yaml
 crop_cfg: configs/audio2motion/model/crop_config.yaml
 face_parser_weight_path: pretrain_weights/face/face-parsing/79999_iter.pth
 resnet_weight_path: pretrain_weights/face/face-parsing/resnet18-5c106cde.pth
+
+# ✅ ДОБАВЛЕНЫ ОТСУТСТВУЮЩИЕ ПУТИ (ТРЕБУЮТСЯ НАПРЯМУЮ В КОНФИГЕ)
+appearance_feature_extractor_path: pretrain_weights/decode/v1/first_stage/base_models/appearance_feature_extractor.pth
+motion_extractor_path: pretrain_weights/decode/v1/first_stage/base_models/motion_extractor.pth
+spade_generator_path: pretrain_weights/decode/v1/first_stage/base_models/spade_generator.pth
+warping_module_path: pretrain_weights/decode/v1/first_stage/base_models/warping_module.pth
+stitching_retargeting_module_path: pretrain_weights/decode/v1/first_stage/retargeting_models/stitching_retargeting_module.pth
+
 need_normalized: true
 batch_size: 100
 source_max_dim: 1920
