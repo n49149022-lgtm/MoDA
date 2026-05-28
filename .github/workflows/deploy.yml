@@ -24,21 +24,11 @@ jobs:
         run: |
           pip install torch==2.3.1+cpu torchvision==0.18.1+cpu torchaudio==2.3.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
-      - name: 📥 Download Pretrained Weights (CRITICAL)
+      - name: 📥 Download Weights via HF CLI
         run: |
           pip install -U huggingface_hub
-          python -c "
-          from huggingface_hub import snapshot_download
-          import os
-          os.makedirs('pretrain_weights', exist_ok=True)
-          print('⬇️ Downloading MoDA weights from HF...')
-          snapshot_download(
-              repo_id='TMElyralab/MoDA',
-              local_dir='.',
-              allow_patterns=['pretrain_weights/**', 'src/datasets/**']
-          )
-          print('✅ Weights downloaded successfully.')
-          "
+          hf download TMElyralab/MoDA --local-dir . --include "pretrain_weights/**" --include "src/datasets/**"
+          echo "✅ Weights downloaded to ./pretrain_weights/"
 
       - name: ⬇️ Install Dependencies
         run: |
