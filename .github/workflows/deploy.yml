@@ -20,12 +20,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: ⬇️ Install CPU dependencies
+      - name: ⬇️ Install PyTorch CPU first
+        run: |
+          pip install torch==2.1.0+cpu torchvision==0.16.0+cpu torchaudio==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+
+      - name: ⬇️ Install other dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg libsndfile1
-          pip install torch==2.1.0+cpu torchvision==0.16.0+cpu torchaudio==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
-          pip install -r requirements.txt
+          pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: 🎬 Generate avatar
         run: |
