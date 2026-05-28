@@ -37,12 +37,13 @@ import numpy as np
 
 def set_seed(seed: int = 42):
     torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # 如果使用多个 GPU
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
     np.random.seed(seed)
     random.seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False  # 关闭 CuDNN 优化以保证可复现性
 
 # 在推理前调用
 set_seed(42)
@@ -64,7 +65,8 @@ class LiveVASAPipeline(object):
         # pretrained encoders of live portrait
         cfg = OmegaConf.load(cfg_path)
         self.device_id = cfg.device_id
-        self.device = f"cuda:{self.device_id}"
+        # FIX: Force CPU mode
+        self.device = "cpu"
         
         # 1 load audio processor
         self.audio_processor: AudioProcessor = AudioProcessor(cfg_path=cfg.audio_model_config, is_training=False)
@@ -87,7 +89,7 @@ class LiveVASAPipeline(object):
 
         self.motion_mean_std = None
         if motion_mean_std_path is not None:
-            self.motion_mean_std = torch.load(motion_mean_std_path)
+            self.motion_mean_std = torch.load(motion_mean_std_path, map_location=self.device)
             self.motion_mean_std["mean"] = self.motion_mean_std["mean"].to(self.device)
             self.motion_mean_std["std"] = self.motion_mean_std["std"].to(self.device)
             print(f"scale mean: {self.motion_mean_std['mean'][0, 63:64]}, std: {self.motion_mean_std['std'][0, 63:64]}")
@@ -106,8 +108,6 @@ class LiveVASAPipeline(object):
         print(motion_generator_path)
         model_data = torch.load(motion_generator_path, map_location=self.device)
         model.load_state_dict(model_data, strict=False)
-       
-
         model.to(self.device)
         model.eval()
 
@@ -289,5 +289,3 @@ if __name__ == "__main__":
                     silent_audio_path = args.silent_audio_path,
                 )
     print(f"Video Result has been saved into: {video_path}")
-
-
