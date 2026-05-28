@@ -24,11 +24,31 @@ jobs:
         run: |
           pip install torch==2.3.1+cpu torchvision==0.18.1+cpu torchaudio==2.3.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
-      - name: 📥 Download Weights via HF CLI
+      - name: 📥 Download ALL Model Weights (Fix LFS/404)
         run: |
           pip install -U huggingface_hub
-          hf download TMElyralab/MoDA --local-dir . --include "pretrain_weights/**" --include "src/datasets/**"
-          echo "✅ Weights downloaded to ./pretrain_weights/"
+          python - << 'PYEOF'
+          import os
+          from huggingface_hub import hf_hub_download
+
+          # Список всех критичных весов из конфига и кода
+          weights = [
+              "pretrain_weights/moda/net-200.pth",
+              "pretrain_weights/decode/v1/first_stage/base_models/appearance_feature_extractor.pth",
+              "pretrain_weights/decode/v1/first_stage/base_models/motion_extractor.pth",
+              "pretrain_weights/decode/v1/first_stage/base_models/spade_generator.pth",
+              "pretrain_weights/decode/v1/first_stage/base_models/warping_module.pth",
+              "pretrain_weights/decode/v1/first_stage/retargeting_models/stitching_retargeting_module.pth",
+              "src/datasets/mean.pt"
+          ]
+
+          for w in weights:
+              os.makedirs(os.path.dirname(w), exist_ok=True)
+              print(f"⬇️ Downloading {os.path.basename(w)}...")
+              hf_hub_download(repo_id="TMElyralab/MoDA", filename=w, local_dir=".")
+              print(f"✅ Saved: ./{w}")
+          print("🎉 All weights ready.")
+          PYEOF
 
       - name: ⬇️ Install Dependencies
         run: |
