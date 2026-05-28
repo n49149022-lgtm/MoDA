@@ -19,6 +19,7 @@ audio_separator==0.18.0
 onnxruntime==1.17.1
 av==12.0.0
 mediapipe==0.10.9
+moviepy==1.0.3
 
 # === УТИЛИТЫ ===
 tqdm==4.66.1
