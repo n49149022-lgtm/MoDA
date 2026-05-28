@@ -1,3 +1,4 @@
+models_config: configs/audio2motion/model/models.yaml
 crop_cfg: configs/audio2motion/model/crop_config.yaml
 face_parser_weight_path: pretrain_weights/face/face-parsing/79999_iter.pth
 resnet_weight_path: pretrain_weights/face/face-parsing/resnet18-5c106cde.pth
@@ -11,7 +12,7 @@ output_height: 512
 output_width: 512
 output_fps: 25
 flag_do_torch_compile: false
-flag_use_half_precision: false  # ✅ ИСПРАВЛЕНО (CPU не тянет FP16)
+flag_use_half_precision: false
 flag_relative_motion: false
 flag_normalize_lip: false
 flag_source_video_eye_retargeting: false
