@@ -1,12 +1,11 @@
-appearance_feature_extractor:
-  path: pretrain_weights/decode/v1/first_stage/base_models/appearance_feature_extractor.pth
-motion_extractor:
-  path: pretrain_weights/decode/v1/first_stage/base_models/motion_extractor.pth
-spade_generator:
-  path: pretrain_weights/decode/v1/first_stage/base_models/spade_generator.pth
-warping_module:
-  path: pretrain_weights/decode/v1/first_stage/base_models/warping_module.pth
-stitching_retargeting_module:
-  path: pretrain_weights/decode/v1/first_stage/retargeting_models/stitching_retargeting_module.pth
-face_analysis:
-  path: pretrain_weights/face/face-parsing/
+model_params:
+  appearance_feature_extractor_params:
+    model_path: pretrain_weights/decode/v1/first_stage/base_models/appearance_feature_extractor.pth
+  motion_extractor_params:
+    model_path: pretrain_weights/decode/v1/first_stage/base_models/motion_extractor.pth
+  spade_generator_params:
+    model_path: pretrain_weights/decode/v1/first_stage/base_models/spade_generator.pth
+  warping_module_params:
+    model_path: pretrain_weights/decode/v1/first_stage/base_models/warping_module.pth
+  stitching_retargeting_module_params:
+    model_path: pretrain_weights/decode/v1/first_stage/retargeting_models/stitching_retargeting_module.pth
