@@ -24,46 +24,44 @@ jobs:
         run: |
           pip install torch==2.3.1+cpu torchvision==0.18.1+cpu torchaudio==2.3.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
-      - name: 📥 Download Weights from CORRECT HF Repo
+      - name: 📥 Download ALL Weights from OFFICIAL Repo
         run: |
           pip install -U huggingface_hub
           python - << 'PYEOF'
-          import os
           from huggingface_hub import snapshot_download
-
-          # ✅ ПРАВИЛЬНЫЙ REPO_ID из официального Space
+          import os
+          
           REPO_ID = "lixinyizju/moda"
           WEIGHTS_DIR = "pretrain_weights"
-
-          print(f"⬇️ Downloading weights from {REPO_ID}...")
-          try:
-              snapshot_download(
-                  repo_id=REPO_ID,
-                  local_dir=WEIGHTS_DIR,
-                  local_dir_use_symlinks=False,
-                  resume_download=True,
-                  allow_patterns=["**/*.pth", "**/*.pt", "**/*.yaml", "**/*.json"]
-              )
-              print(f"✅ Weights downloaded to ./{WEIGHTS_DIR}/")
-          except Exception as e:
-              print(f"❌ Download failed: {e}")
-              # Fallback: try to download individual critical files
-              from huggingface_hub import hf_hub_download
-              critical_files = [
-                  "pretrain_weights/moda/net-200.pth",
-                  "pretrain_weights/decode/v1/first_stage/base_models/appearance_feature_extractor.pth",
-                  "pretrain_weights/decode/v1/first_stage/base_models/motion_extractor.pth",
-                  "pretrain_weights/decode/v1/first_stage/base_models/spade_generator.pth",
-                  "pretrain_weights/decode/v1/first_stage/base_models/warping_module.pth",
-                  "pretrain_weights/decode/v1/first_stage/retargeting_models/stitching_retargeting_module.pth",
-              ]
-              for f in critical_files:
-                  try:
-                      os.makedirs(os.path.dirname(f), exist_ok=True)
-                      hf_hub_download(repo_id=REPO_ID, filename=f, local_dir=".")
-                      print(f"✅ Downloaded {f}")
-                  except Exception as e2:
-                      print(f"⚠️ Failed {f}: {e2}")
+          
+          print(f"⬇️ Downloading ALL weights from {REPO_ID}...")
+          print("This may take 3-5 minutes (~500MB)")
+          
+          snapshot_download(
+              repo_id=REPO_ID,
+              local_dir=WEIGHTS_DIR,
+              local_dir_use_symlinks=False,
+              resume_download=True,
+          )
+          
+          # Verify critical files
+          critical_files = [
+              "moda/net-200.pth",
+              "decode/v1/first_stage/base_models/appearance_feature_extractor.pth",
+              "decode/v1/first_stage/base_models/motion_extractor.pth",
+              "decode/v1/first_stage/base_models/spade_generator.pth",
+          ]
+          
+          print("\n📋 Verifying downloaded files:")
+          for f in critical_files:
+              full_path = os.path.join(WEIGHTS_DIR, f)
+              if os.path.exists(full_path):
+                  size_mb = os.path.getsize(full_path) / (1024*1024)
+                  print(f"  ✅ {f} ({size_mb:.1f} MB)")
+              else:
+                  print(f"  ❌ MISSING: {f}")
+          
+          print("\n✅ Weights downloaded to ./pretrain_weights/")
           PYEOF
 
       - name: ⬇️ Install Dependencies
