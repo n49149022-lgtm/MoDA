@@ -20,15 +20,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: ⬇️ Install PyTorch CPU (separate step)
+      - name: ⬇️ Install PyTorch 2.3.1+cpu (FIX scheduler API)
         run: |
-          pip install torch==2.1.0+cpu torchvision==0.16.0+cpu torchaudio==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install torch==2.3.1+cpu torchvision==0.18.1+cpu torchaudio==2.3.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
-      - name: ⬇️ Install other deps from clean PyPI
+      - name: ⬇️ Install other deps
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg libsndfile1
-          pip install -r requirements.txt --index-url https://pypi.org/simple
+          pip install -r requirements.txt
 
       - name: 🎬 Generate avatar
         run: |
