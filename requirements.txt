@@ -1,7 +1,5 @@
-torch==2.1.0+cpu
-torchvision==0.16.0+cpu
-torchaudio==2.1.0+cpu
---index-url https://download.pytorch.org/whl/cpu
+# PyTorch устанавливается ОТДЕЛЬНО в workflow (не здесь!)
+# Этот файл только для остальных зависимостей
 
 gradio==4.19.0
 omegaconf==2.3.0
