@@ -24,6 +24,18 @@ jobs:
         run: |
           pip install torch==2.3.1+cpu torchvision==0.18.1+cpu torchaudio==2.3.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
+      - name: 📥 Download MoDA weights from HF Hub
+        run: |
+          pip install huggingface_hub
+          python -c "
+          from huggingface_hub import snapshot_download
+          snapshot_download(
+              repo_id='TMElyralab/MoDA',
+              local_dir='.',
+              allow_patterns=['pretrain_weights/**', 'src/datasets/**']
+          )
+          "
+
       - name: ⬇️ Install other deps
         run: |
           sudo apt-get update
