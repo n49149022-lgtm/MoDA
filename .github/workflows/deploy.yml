@@ -1,24 +1,44 @@
-name: Sync to Hugging Face Space
+name: 🎬 Generate Talking Avatar (CPU)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      image_url:
+        description: 'URL изображения аватара (или оставь пустым для теста)'
+        required: false
+        default: ''
 
 jobs:
-  sync-to-hub:
+  generate-avatar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: 📦 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-          lfs: true
-      
-      - name: Push to Hugging Face Space
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          python-version: '3.10'
+
+      - name: ⬇️ Install CPU dependencies
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git remote add space https://NIKOLAJ5313:$HF_TOKEN@huggingface.co/spaces/NIKOLAJ5313/moda-clean
-          git push --force space main
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libsndfile1
+          pip install torch==2.1.0+cpu torchvision==0.16.0+cpu torchaudio==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: 🎬 Generate avatar
+        run: |
+          python src/models/inference/moda_test.py \
+            --cfg_path configs/audio2motion/inference/inference.yaml \
+            --image_path src/examples/reference_images/6.jpg \
+            --audio_path src/examples/driving_audios/5.wav \
+            --save_dir output/ \
+            --motion_mean_std_path src/datasets/mean.pt
+
+      - name: 📤 Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: talking-avatar
+          path: output/
+          retention-days: 7
